@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,6 +37,33 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 80px 24px;
+    }
+    .lang-selector {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: var(--forge-space-4);
+    }
+    .lang-btn {
+      background: transparent;
+      border: 1px solid var(--forge-color-line);
+      color: var(--forge-color-ink);
+      padding: 6px 12px;
+      font-family: var(--forge-font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s var(--forge-ease-out);
+    }
+    .lang-btn.active {
+      border-color: var(--forge-color-white);
+      color: var(--forge-color-white);
+      font-weight: 700;
+    }
+    .lang-btn:hover:not(.active) {
+      border-color: var(--forge-color-ink);
+      color: var(--forge-color-chalk);
     }
     .header-layout {
       margin-bottom: var(--forge-space-6);
@@ -234,9 +261,14 @@
 </head>
 <body>
 <main>
+  <div class="lang-selector">
+    <button class="lang-btn active" id="btn-en">EN</button>
+    <button class="lang-btn" id="btn-es">ES</button>
+  </div>
+
   <div class="header-layout">
     <h1>Lit Component Forge</h1>
-    <p class="lead">AI-ASSISTED DEVELOPMENT OF ROBUST MICRO-FRONTENDS / COMPLIANT WITH TEAM CONVENTIONS / SHADOW DOM / ZERO DEPENDENCIES</p>
+    <p class="lead" id="app-subtitle">AI-ASSISTED DEVELOPMENT OF ROBUST MICRO-FRONTENDS / COMPLIANT WITH TEAM CONVENTIONS / SHADOW DOM / ZERO DEPENDENCIES</p>
   </div>
 
   <form id="f">
@@ -249,43 +281,43 @@
 
   <div class="grid">
     <div class="pre-container">
-      <div class="label-tag">SOURCE CODE (.JS)</div>
+      <div class="label-tag" id="source-title">SOURCE CODE (.JS)</div>
       <pre id="code">// The generated source code will appear here.</pre>
     </div>
     <div>
-      <div class="label-tag">LIVE PREVIEW (CUSTOM ELEMENT)</div>
+      <div class="label-tag" id="preview-title">LIVE PREVIEW (CUSTOM ELEMENT)</div>
       <div class="preview" id="preview-container">
         <div class="preview-canvas" id="preview">
           <!-- Live component will mount here -->
         </div>
         <div class="preview-log" id="log">
-          <div>&gt; Event output terminal active. Click generated element actions to inspect event dispatches.</div>
+          <div id="terminal-init">&gt; Event output terminal active. Click generated element actions to inspect event dispatches.</div>
         </div>
       </div>
     </div>
   </div>
 
   <section class="recruiter-note">
-    <h3>Developer Architecture Insight</h3>
-    <p>
+    <h3 id="recruiter-title">Developer Architecture Insight</h3>
+    <p id="recruiter-desc">
       This program solves a critical bottleneck in enterprise environments: the scaling, consistency, and compliance of distributed micro-frontends.
       By pairing a custom generative AI model with strict team schema validations, it compiles user requirements directly into production-grade Lit elements.
       Key problems solved:
     </p>
-    <ul style="margin: var(--forge-space-2) 0 var(--forge-space-2) 20px; list-style-type: square;">
-      <li>Ensures complete Shadow DOM encapsulation to shield component behavior and theme tokens.</li>
-      <li>Enforces strict ARIA roles, labels, and accessible keyboard focus models by default.</li>
-      <li>Generates native-compliant Lit structures without requiring experimental legacy decorators, ensuring future-proof, buildless browser compatibility.</li>
-      <li>Exposes reactive declarative properties and standard bubble/composed CustomEvents for decoupled communication across parent applications.</li>
+    <ul style="margin: var(--forge-space-2) 0 var(--forge-space-2) 20px; list-style-type: square;" id="recruiter-list">
+      <li id="bullet-1">Ensures complete Shadow DOM encapsulation to shield component behavior and theme tokens.</li>
+      <li id="bullet-2">Enforces strict ARIA roles, labels, and accessible keyboard focus models by default.</li>
+      <li id="bullet-3">Generates native-compliant Lit structures without requiring experimental legacy decorators, ensuring future-proof, buildless browser compatibility.</li>
+      <li id="bullet-4">Exposes reactive declarative properties and standard bubble/composed CustomEvents for decoupled communication across parent applications.</li>
     </ul>
-    <p>
+    <p id="recruiter-mcp">
       It features an active Model Context Protocol (MCP) server, making this pipeline immediately accessible to developer agents, IDE integrations, and automated pipelines.
     </p>
   </section>
 
   <footer class="footer">
     <span>LIT-COMPONENT-FORGE v0.1.0</span>
-    <span>DEVELOPED BY NOOMESK 2026</span>
+    <span id="footer-dev">DEVELOPED BY NOOMESK 2026</span>
   </footer>
 </main>
 
@@ -296,6 +328,115 @@
   const code = document.getElementById('code');
   const preview = document.getElementById('preview');
   const log = document.getElementById('log');
+  const promptInput = document.getElementById('prompt');
+
+  const btnEn = document.getElementById('btn-en');
+  const btnEs = document.getElementById('btn-es');
+
+  const appSubtitle = document.getElementById('app-subtitle');
+  const sourceTitle = document.getElementById('source-title');
+  const previewTitle = document.getElementById('preview-title');
+  const terminalInit = document.getElementById('terminal-init');
+  const recruiterTitle = document.getElementById('recruiter-title');
+  const recruiterDesc = document.getElementById('recruiter-desc');
+  const recruiterMCP = document.getElementById('recruiter-mcp');
+  const bullet1 = document.getElementById('bullet-1');
+  const bullet2 = document.getElementById('bullet-2');
+  const bullet3 = document.getElementById('bullet-3');
+  const bullet4 = document.getElementById('bullet-4');
+  const footerDev = document.getElementById('footer-dev');
+
+  let currentLang = 'en';
+
+  const i18n = {
+    en: {
+      subtitle: "AI-ASSISTED DEVELOPMENT OF ROBUST MICRO-FRONTENDS / COMPLIANT WITH TEAM CONVENTIONS / SHADOW DOM / ZERO DEPENDENCIES",
+      placeholder: "e.g. transfer card with amount and destination account",
+      btnGenerate: "Generate Element",
+      btnGenerating: "GENERATING...",
+      sourceTitle: "SOURCE CODE (.JS)",
+      previewTitle: "LIVE PREVIEW (CUSTOM ELEMENT)",
+      terminalActive: "> Event output terminal active. Click generated element actions to inspect event dispatches.",
+      compilationSuccess: (tag) => `Component "${tag}" successfully compiled.`,
+      mountedSuccess: (tag) => `Mounted <${tag}> in preview canvas.`,
+      eventDispatched: (name, detail) => `EVENT DISPATCHED: "${name}" with detail: ${detail}`,
+      recruiterTitle: "Developer Architecture Insight",
+      recruiterDesc: "This program solves a critical bottleneck in enterprise environments: the scaling, consistency, and compliance of distributed micro-frontends. By pairing a custom generative AI model with strict team schema validations, it compiles user requirements directly into production-grade Lit elements. Key problems solved:",
+      bullet1: "Ensures complete Shadow DOM encapsulation to shield component behavior and theme tokens.",
+      bullet2: "Enforces strict ARIA roles, labels, and accessible keyboard focus models by default.",
+      bullet3: "Generates native-compliant Lit structures without requiring experimental legacy decorators, ensuring future-proof, buildless browser compatibility.",
+      bullet4: "Exposes reactive declarative properties and standard bubble/composed CustomEvents for decoupled communication across parent applications.",
+      recruiterMCP: "It features an active Model Context Protocol (MCP) server, making this pipeline immediately accessible to developer agents, IDE integrations, and automated pipelines.",
+      footerDev: "DEVELOPED BY NOOMESK 2026",
+      sourceInit: "// The generated source code will appear here.",
+      errorTag: "Generation failed"
+    },
+    es: {
+      subtitle: "DESARROLLO DE MICRO-FRONTENDS ASISTIDO POR IA / CUMPLE CON LAS CONVENCIONES DEL EQUIPO / SHADOW DOM / CERO DEPENDENCIAS",
+      placeholder: "ej. tarjeta de transferencia con monto y cuenta destino",
+      btnGenerate: "Generar elemento",
+      btnGenerating: "GENERANDO...",
+      sourceTitle: "CÓDIGO FUENTE (.JS)",
+      previewTitle: "VISTA PREVIA EN VIVO (CUSTOM ELEMENT)",
+      terminalActive: "> Terminal de salida de eventos activa. Haz clic en las acciones del elemento generado para inspeccionar los eventos.",
+      compilationSuccess: (tag) => `Componente "${tag}" compilado con éxito.`,
+      mountedSuccess: (tag) => `Se montó <${tag}> en el lienzo de vista previa.`,
+      eventDispatched: (name, detail) => `EVENTO EMITIDO: "${name}" con datos: ${detail}`,
+      recruiterTitle: "Análisis de Arquitectura para Reclutadores",
+      recruiterDesc: "Este programa resuelve un cuello de botella crítico en entornos corporativos: la escala, consistencia y conformidad de micro-frontends distribuidos. Al combinar una IA generativa con validaciones estrictas de esquemas de equipo, compila los requisitos del usuario directamente en componentes Lit listos para producción. Problemas clave resueltos:",
+      bullet1: "Garantiza el encapsulamiento total de Shadow DOM para proteger el comportamiento y los tokens de tema.",
+      bullet2: "Impone roles ARIA, etiquetas y focos de teclado accesibles por defecto.",
+      bullet3: "Generar estructuras Lit nativas sin requerir decoradores legacy experimentales, asegurando compatibilidad futura sin procesos de compilación complejos.",
+      bullet4: "Expone propiedades declarativas reactivas y CustomEvents estándar burbujeantes/compuestos para una comunicación desacoplada con aplicaciones padre.",
+      recruiterMCP: "Cuenta con un servidor del Protocolo de Contexto de Modelo (MCP) activo, haciendo que este flujo de trabajo sea accesible al instante para agentes de desarrollo, IDEs y pipelines automatizados.",
+      footerDev: "DESARROLLADO POR NOOMESK 2026",
+      sourceInit: "// El código generado aparecerá aquí.",
+      errorTag: "Error de generación"
+    }
+  };
+
+  const applyLang = (lang) => {
+    currentLang = lang;
+    const t = i18n[lang];
+    appSubtitle.textContent = t.subtitle;
+    promptInput.placeholder = t.placeholder;
+    sourceTitle.textContent = t.sourceTitle;
+    previewTitle.textContent = t.previewTitle;
+    recruiterTitle.textContent = t.recruiterTitle;
+    recruiterDesc.textContent = t.recruiterDesc;
+    recruiterMCP.textContent = t.recruiterMCP;
+    bullet1.textContent = t.bullet1;
+    bullet2.textContent = t.bullet2;
+    bullet3.textContent = t.bullet3;
+    bullet4.textContent = t.bullet4;
+    footerDev.textContent = t.footerDev;
+
+    if (!btn.disabled) {
+      btn.textContent = t.btnGenerate;
+    } else {
+      btn.textContent = t.btnGenerating;
+    }
+
+    if (code.textContent.trim() === i18n.en.sourceInit || code.textContent.trim() === i18n.es.sourceInit || code.textContent.trim() === "") {
+      code.textContent = t.sourceInit;
+    }
+
+    if (log.children.length === 1 && log.firstElementChild.id === 'terminal-init') {
+      terminalInit.textContent = t.terminalActive;
+    }
+  };
+
+  btnEn.addEventListener('click', () => {
+    btnEn.classList.add('active');
+    btnEs.classList.remove('active');
+    applyLang('en');
+  });
+
+  btnEs.addEventListener('click', () => {
+    btnEs.classList.add('active');
+    btnEn.classList.remove('active');
+    applyLang('es');
+  });
 
   const addLog = (text, isEvent = false) => {
     const entry = document.createElement('div');
@@ -309,24 +450,31 @@
     e.preventDefault();
     err.textContent = '';
     btn.disabled = true;
-    btn.textContent = 'GENERATING...';
+    btn.textContent = i18n[currentLang].btnGenerating;
     try {
-      const promptVal = document.getElementById('prompt').value;
+      const promptVal = promptInput.value;
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: promptVal }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Generation failed');
+      if (!res.ok) throw new Error(data.error || i18n[currentLang].errorTag);
 
       code.textContent = data.source;
-      addLog(`Component "${data.tag}" successfully compiled.`);
+      addLog(i18n[currentLang].compilationSuccess(data.tag));
 
-      // Para asegurar la resolución de módulos dentro de un ObjectURL de tipo blob en cualquier navegador,
-      // reescribimos temporalmente las importaciones bare de 'lit' a URL absolutas en la ejecución en vivo.
-      // El código fuente mostrado arriba en la interfaz se mantiene 100% limpio y original.
+      // Generamos un tag único para evadir el caché del registro de custom elements
+      // del navegador. Esto obliga a instanciar la clase más reciente en cada generación.
+      const uniqueSuffix = Math.floor(Math.random() * 100000);
+      const previewTag = `${data.tag}-${uniqueSuffix}`;
+
       let executableSource = data.source;
+      // Reemplazamos las referencias del tag anterior en la definición y CSS
+      executableSource = executableSource.replace(new RegExp(`'${data.tag}'`, 'g'), `'${previewTag}'`);
+      executableSource = executableSource.replace(new RegExp(data.tag, 'g'), previewTag);
+
+      // Reemplazamos el bare import de lit para cargarlo directo por CDN en el Blob
       executableSource = executableSource.replace(
         /from 'lit';/g,
         "from 'https://cdn.jsdelivr.net/npm/lit@3/+esm';"
@@ -337,24 +485,23 @@
       await import(url);
 
       preview.innerHTML = '';
-      const el = document.createElement(data.tag);
+      const el = document.createElement(previewTag);
 
-      // Si el componente tiene propiedades definidas, las inicializamos con valores de ejemplo visibles
+      // Si el componente tiene propiedades definidas, las inicializamos con valores demo visibles
       if (el.constructor.properties) {
         Object.keys(el.constructor.properties).forEach(propKey => {
           const schema = el.constructor.properties[propKey];
           if (schema.type === Number) {
-            el[propKey] = 250; // valor numérico de demostración
+            el[propKey] = 250; // número demo
           } else if (schema.type === Boolean) {
-            el[propKey] = true; // flag activado
+            el[propKey] = true; // toggle activo
           } else {
-            el[propKey] = "DEMO_VAL"; // string visible
+            el[propKey] = "DEMO_VAL"; // string demo
           }
         });
       }
 
-      // Escuchamos de manera dinámica todos los eventos personalizados declarados en el componente
-      // para mostrarlos en tiempo real en nuestra terminal integrada de logs.
+      // Escuchamos dinámicamente los eventos declarados
       const eventMatches = [...data.source.matchAll(/@fires\s+([a-zA-Z0-9,-_\s]+)/g)];
       if (eventMatches.length) {
         const declaredEvents = eventMatches[0][1]
@@ -365,21 +512,24 @@
         declaredEvents.forEach(eventName => {
           el.addEventListener(eventName, (event) => {
             const detailStr = event.detail !== undefined && event.detail !== null ? JSON.stringify(event.detail) : 'null';
-            addLog(`EVENT DISPATCHED: "${eventName}" with detail: ${detailStr}`, true);
+            addLog(i18n[currentLang].eventDispatched(eventName, detailStr), true);
           });
         });
       }
 
       preview.appendChild(el);
-      addLog(`Mounted <${data.tag}> in preview canvas.`);
+      addLog(i18n[currentLang].mountedSuccess(data.tag));
     } catch (ex) {
       err.textContent = ex.message;
       addLog(`ERROR: ${ex.message}`);
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Generate Element';
+      btn.textContent = i18n[currentLang].btnGenerate;
     }
   });
+
+  // Inicializa en inglés por defecto
+  applyLang('en');
 </script>
 </body>
 </html>
