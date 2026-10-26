@@ -2,3 +2,4 @@ node_modules/
 .vercel/
 .vercel
 .env*
+.DS_Store
