@@ -20,7 +20,7 @@ npm run mcp   # servidor MCP por stdio
 
 Para la demo, configura `GROQ_API_KEY` en Vercel.
 
-## Conectar con un cliente MCP
+## Conectar con un host MCP
 
 ```json
 {
