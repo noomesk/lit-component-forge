@@ -7,42 +7,39 @@
   <style>
     :root {
       --forge-color-black: #000;
-      --forge-color-surface: #121314;
-      --forge-color-surface-2: #1d1f21;
-      --forge-color-line: #313233;
-      --forge-color-rule: #272727;
-      --forge-color-hairline: #ffffff1a;
-      --forge-color-ink: #7d7d7d;
-      --forge-color-chalk: #d9d9d9;
+      --forge-color-surface: #0a0a0a;
+      --forge-color-surface-2: #141414;
+      --forge-color-line: #2a2a2a;
+      --forge-color-rule: #1f1f1f;
+      --forge-color-ink: #8a8a8a;
+      --forge-color-chalk: #e6e6e6;
       --forge-color-white: #fff;
-      --forge-color-accent: #96ff1e;
-      --forge-color-accent-glow: #96ff1ea6;
-      --forge-color-blue: #3b9aff;
+      --forge-color-accent: #fff;
       --forge-font-sans: system-ui, sans-serif;
       --forge-font-mono: ui-monospace, monospace;
-      --forge-radius: 8px;
+      --forge-radius: 4px;
       --forge-space-2: .4rem;
       --forge-space-4: 1rem;
       --forge-space-6: 1.5rem;
       --forge-ease-out: cubic-bezier(0, 0, .2, 1);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--forge-color-surface); color: var(--forge-color-chalk); font-family: var(--forge-font-sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+    body { background: var(--forge-color-black); color: var(--forge-color-chalk); font-family: var(--forge-font-sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
     main { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
-    h1 { font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--forge-color-accent); font-weight: 400; font-family: var(--forge-font-mono); }
+    h1 { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--forge-color-white); font-weight: 500; font-family: var(--forge-font-mono); }
     p.lead { color: var(--forge-color-ink); font-size: 14px; margin-top: var(--forge-space-2); }
     form { display: flex; gap: 12px; margin: var(--forge-space-6) 0; }
-    input { flex: 1; background: var(--forge-color-surface-2); border: 1px solid var(--forge-color-line); border-radius: var(--forge-radius); color: var(--forge-color-chalk); padding: 12px; font: inherit; transition: border-color .15s var(--forge-ease-out); }
-    input:focus-visible { outline: 2px solid var(--forge-color-accent); outline-offset: 2px; }
-    button { background: var(--forge-color-accent); color: var(--forge-color-black); border: 0; border-radius: var(--forge-radius); padding: 12px 20px; font: inherit; font-weight: 700; cursor: pointer; transition: box-shadow .15s var(--forge-ease-out); }
-    button:hover { box-shadow: 0 0 0 4px var(--forge-color-accent-glow); }
-    button:focus-visible { outline: 2px solid var(--forge-color-accent); outline-offset: 2px; }
-    button:disabled { opacity: .4; cursor: default; box-shadow: none; }
+    input { flex: 1; background: var(--forge-color-surface-2); border: 1px solid var(--forge-color-line); border-radius: var(--forge-radius); color: var(--forge-color-chalk); padding: 12px; font: inherit; }
+    input:focus-visible { outline: 1px solid var(--forge-color-white); outline-offset: 2px; }
+    button { background: var(--forge-color-white); color: var(--forge-color-black); border: 1px solid var(--forge-color-white); border-radius: var(--forge-radius); padding: 12px 20px; font: inherit; font-weight: 500; cursor: pointer; }
+    button:hover { background: var(--forge-color-chalk); }
+    button:focus-visible { outline: 1px solid var(--forge-color-white); outline-offset: 2px; }
+    button:disabled { opacity: .4; cursor: default; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--forge-space-4); }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
     pre { background: var(--forge-color-black); border: 1px solid var(--forge-color-rule); border-radius: var(--forge-radius); padding: var(--forge-space-4); overflow: auto; font: 12px/1.5 var(--forge-font-mono); color: var(--forge-color-ink); min-height: 280px; }
-    .preview { border: 1px solid var(--forge-color-rule); border-radius: var(--forge-radius); padding: var(--forge-space-4); min-height: 280px; background: var(--forge-color-surface-2); }
-    .err { color: var(--forge-color-accent); font-size: 12px; min-height: 16px; margin-top: var(--forge-space-2); }
+    .preview { border: 1px solid var(--forge-color-rule); border-radius: var(--forge-radius); padding: var(--forge-space-4); min-height: 280px; background: var(--forge-color-surface); }
+    .err { color: var(--forge-color-chalk); font-size: 12px; min-height: 16px; margin-top: var(--forge-space-2); }
   </style>
   <script type="importmap">
     { "imports": { "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm", "lit/": "https://cdn.jsdelivr.net/npm/lit@3/" } }

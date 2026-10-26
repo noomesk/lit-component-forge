@@ -135,15 +135,15 @@ export class ${cls} extends LitElement {
     :host {
       display: block;
       font-family: var(--forge-font-sans, system-ui, sans-serif);
-      color: var(--${tag}-text, var(--forge-color-chalk, #d9d9d9));
-      background: var(--${tag}-bg, var(--forge-color-surface, #121314));
-      border: 1px solid var(--${tag}-border, var(--forge-color-line, #313233));
-      border-radius: var(--forge-radius, 8px);
+      color: var(--${tag}-text, var(--forge-color-chalk, #e6e6e6));
+      background: var(--${tag}-bg, var(--forge-color-surface, #0a0a0a));
+      border: 1px solid var(--${tag}-border, var(--forge-color-line, #2a2a2a));
+      border-radius: var(--forge-radius, 4px);
       padding: var(--forge-space-4, 1rem);
       box-sizing: border-box;
     }
     :focus-visible {
-      outline: 2px solid var(--${tag}-accent, var(--forge-color-accent, #96ff1e));
+      outline: 1px solid var(--${tag}-accent, var(--forge-color-accent, #fff));
       outline-offset: 2px;
     }
   \`;
