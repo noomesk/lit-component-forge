@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lit Component Forge</title>
+  <style>
+    body { margin: 0; background: #050505; color: #ededed; font-family: ui-monospace, monospace; }
+    main { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+    h1 { font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: #33ff99; font-weight: 400; }
+    p.lead { color: #888; font-size: 14px; }
+    form { display: flex; gap: 12px; margin: 24px 0; }
+    input { flex: 1; background: transparent; border: 1px solid #222; color: #ededed; padding: 12px; font: inherit; }
+    button { background: #ededed; color: #050505; border: 0; padding: 12px 20px; font: inherit; cursor: pointer; }
+    button:disabled { opacity: .4; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    pre { background: #0a0a0a; border: 1px solid #222; padding: 16px; overflow: auto; font-size: 12px; min-height: 280px; margin: 0; }
+    .preview { border: 1px solid #222; padding: 16px; min-height: 280px; }
+    .err { color: #ff6b6b; font-size: 12px; min-height: 16px; }
+  </style>
+  <script type="importmap">
+    { "imports": { "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm", "lit/": "https://cdn.jsdelivr.net/npm/lit@3/" } }
+  </script>
+</head>
+<body>
+<main>
+  <h1>Lit Component Forge</h1>
+  <p class="lead">Describe un componente y lo genero con Lit, Shadow DOM y eventos personalizados.</p>
+
+  <form id="f">
+    <input id="prompt" placeholder="ej. tarjeta de transferencia con monto y cuenta destino" maxlength="300" required />
+    <button id="go" type="submit">Generar</button>
+  </form>
+  <div class="err" id="err"></div>
+
+  <div class="grid">
+    <pre id="code">// el código generado aparece aquí</pre>
+    <div class="preview" id="preview"></div>
+  </div>
+</main>
+
+<script type="module">
+  const form = document.getElementById('f');
+  const btn = document.getElementById('go');
+  const err = document.getElementById('err');
+  const code = document.getElementById('code');
+  const preview = document.getElementById('preview');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    btn.disabled = true;
+    btn.textContent = '...';
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: document.getElementById('prompt').value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+
+      code.textContent = data.source;
+      // Vista previa: el componente se registra y se monta dentro del contenedor
+      const blob = new Blob([data.source], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const mod = await import(url);
+      preview.innerHTML = '';
+      preview.appendChild(document.createElement(data.tag));
+    } catch (ex) {
+      err.textContent = ex.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Generar';
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "lit-component-forge",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Servidor MCP + demo para generar componentes Lit con convenciones de equipo",
+  "type": "module",
+  "scripts": {
+    "mcp": "node server/index.js",
+    "test": "node --test test/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "lit": "^3.3.3",
+    "zod": "^4.6.7"
+  }
+}
