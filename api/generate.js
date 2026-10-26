@@ -2,7 +2,7 @@
 // La key vive en GROQ_API_KEY (Vercel), nunca en el navegador.
 import { generateComponent } from '../server/generator.js';
 
-const MODEL = 'llama3-8b-8192';
+const MODEL = 'mixtral-8x7b-32768';
 
 const SYSTEM = `Eres un generador de componentes Lit. Devuelve SOLO JSON válido con esta forma:
 {"name":"kebab-case con guion","description":"una frase","props":[{"name":"camelCase","type":"string|number|boolean","default":"valor JS"}],"events":[{"name":"kebab-case"}]}
