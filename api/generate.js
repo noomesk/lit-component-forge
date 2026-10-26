@@ -33,15 +33,30 @@ export default async function handler(req, res) {
       }),
     });
     if (!upstream.ok) {
-      console.error('Groq error', upstream.status, await upstream.text());
+      console.error('Groq error', upstream.status);
       return res.status(502).json({ error: 'Upstream error' });
     }
     const data = await upstream.json();
-    const spec = JSON.parse(data.choices[0].message.content);
-    const out = generateComponent(spec);
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content !== 'string') return res.status(502).json({ error: 'Empty model response' });
+
+    let spec;
+    try {
+      spec = JSON.parse(content);
+    } catch {
+      return res.status(502).json({ error: 'Model returned invalid JSON' });
+    }
+
+    let out;
+    try {
+      out = generateComponent(spec);
+    } catch (err) {
+      // La salida del modelo no es confiable: un spec inválido es error del cliente de generación, no del servidor.
+      return res.status(422).json({ error: err.message });
+    }
     return res.status(200).json({ tag: out.tag, source: out.source });
   } catch (err) {
-    console.error(err);
+    console.error('generate failed', err?.name);
     return res.status(502).json({ error: 'Generation failed' });
   }
 }
