@@ -1,12 +1,22 @@
-// Función serverless: convierte una descripción en una especificación de componente con Groq.
-// La key vive en GROQ_API_KEY (Vercel), nunca en el navegador.
+// Serverless function: converts a description into a Lit element specification using Groq.
+// Relies on GROQ_API_KEY environment variable.
 import { generateComponent } from '../server/generator.js';
 
-const MODEL = 'gemma2-9b-it';
+// The verified model ID active in your Groq account.
+const MODEL = 'openai/gpt-oss-120b';
 
-const SYSTEM = `Eres un generador de componentes Lit. Devuelve SOLO JSON válido con esta forma:
-{"name":"kebab-case con guion","description":"una frase","props":[{"name":"camelCase","type":"string|number|boolean","default":"valor JS"}],"events":[{"name":"kebab-case"}]}
-Sin texto extra, sin markdown.`;
+const SYSTEM = `You are a Lit component specifier. Return ONLY a valid JSON object matching this schema:
+{
+  "name": "kebab-case-with-hyphen",
+  "description": "a concise single sentence description",
+  "props": [
+    {"name": "camelCaseName", "type": "string|number|boolean", "default": "valid JS literal value"}
+  ],
+  "events": [
+    {"name": "kebab-case-event"}
+  ]
+}
+No preambles, no explanations, no markdown block wrappers (do not include \`\`\`json).`;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -24,7 +34,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: MODEL,
         temperature: 0.2,
-        max_tokens: 600,
+        max_tokens: 1500, // Presupuesto de tokens elevado para evitar truncamiento
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: SYSTEM },
@@ -32,12 +42,13 @@ export default async function handler(req, res) {
         ],
       }),
     });
+
     if (!upstream.ok) {
-      // El cuerpo de error de Groq describe la causa (modelo, parámetros); no incluye la clave.
       const detail = (await upstream.text()).slice(0, 500);
       console.error('Groq error', upstream.status, detail);
       return res.status(502).json({ error: 'Upstream error' });
     }
+
     const data = await upstream.json();
     const content = data?.choices?.[0]?.message?.content;
     if (typeof content !== 'string') return res.status(502).json({ error: 'Empty model response' });
@@ -53,9 +64,9 @@ export default async function handler(req, res) {
     try {
       out = generateComponent(spec);
     } catch (err) {
-      // La salida del modelo no es confiable: un spec inválido es error del cliente de generación, no del servidor.
       return res.status(422).json({ error: err.message });
     }
+
     return res.status(200).json({ tag: out.tag, source: out.source });
   } catch (err) {
     console.error('generate failed', err?.name);
