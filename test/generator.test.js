@@ -2,18 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { generateComponent, validateName } from '../server/generator.js';
 
-test('rechaza nombres sin guion', () => {
-  assert.equal(validateName('boton').ok, false);
+test('rejects names without hyphens', () => {
+  assert.equal(validateName('button').ok, false);
 });
 
-test('agrega el prefijo del equipo', () => {
+test('adds the team prefix', () => {
   assert.equal(validateName('transfer card').tag, 'forge-transfer-card');
 });
 
-test('genera un componente con props, eventos y registro sin decoradores', () => {
+test('generates a component with props, events, and registration', () => {
   const out = generateComponent({
     name: 'transfer-card',
-    description: 'Tarjeta de transferencia',
+    description: 'Transfer card',
     props: [{ name: 'amount', type: 'number', default: '0' }],
     events: [{ name: 'transfer-submit' }],
   });
@@ -26,15 +26,15 @@ test('genera un componente con props, eventos y registro sin decoradores', () =>
   assert.doesNotMatch(out.source, /@customElement|@property/);
 });
 
-test('escapa defaults de string y los convierte en literal JS válido', () => {
+test('escapes string defaults and creates valid JS literals', () => {
   const out = generateComponent({
     name: 'demo-x',
-    props: [{ name: 'label', type: 'string', default: 'di "hola"\n</script>' }],
+    props: [{ name: 'label', type: 'string', default: 'say "hello"\n</script>' }],
   });
-  assert.match(out.source, /this\.label = "di \\"hola\\"\\n<\/script>";/);
+  assert.match(out.source, /this\.label = "say \\"hello\\"\\n<\/script>";/);
 });
 
-test('booleanos por defecto son false salvo que se indique true', () => {
+test('booleans default to false unless true is specified', () => {
   const out = generateComponent({
     name: 'demo-flag',
     props: [{ name: 'open', type: 'boolean' }, { name: 'on', type: 'boolean', default: 'true' }],
@@ -43,35 +43,35 @@ test('booleanos por defecto son false salvo que se indique true', () => {
   assert.match(out.source, /this\.on = true;/);
 });
 
-test('rechaza default numérico no finito', () => {
-  assert.throws(() => generateComponent({ name: 'demo-n', props: [{ name: 'n', type: 'number', default: 'NaN' }] }), /Default numérico/);
+test('rejects invalid non-finite numeric defaults', () => {
+  assert.throws(() => generateComponent({ name: 'demo-n', props: [{ name: 'n', type: 'number', default: 'NaN' }] }), /Invalid numeric default/);
 });
 
-test('rechaza nombres de prop que no son camelCase o son reservados', () => {
-  assert.throws(() => generateComponent({ name: 'demo-p', props: [{ name: 'Bad-Name' }] }), /Nombre de prop inválido/);
-  assert.throws(() => generateComponent({ name: 'demo-p', props: [{ name: 'render' }] }), /Nombre de prop inválido/);
+test('rejects non-camelCase or reserved property names', () => {
+  assert.throws(() => generateComponent({ name: 'demo-p', props: [{ name: 'Bad-Name' }] }), /Invalid property name/);
+  assert.throws(() => generateComponent({ name: 'demo-p', props: [{ name: 'render' }] }), /Invalid property name/);
 });
 
-test('rechaza tipos de prop fuera de la lista permitida', () => {
-  assert.throws(() => generateComponent({ name: 'demo-t', props: [{ name: 'a', type: 'object' }] }), /Tipo de prop inválido/);
+test('rejects property types outside the allowed list', () => {
+  assert.throws(() => generateComponent({ name: 'demo-t', props: [{ name: 'a', type: 'object' }] }), /Invalid property type/);
 });
 
-test('rechaza nombres de evento inválidos y duplicados', () => {
-  assert.throws(() => generateComponent({ name: 'demo-e', events: [{ name: '---' }] }), /Nombre de evento inválido/);
-  assert.throws(() => generateComponent({ name: 'demo-e', events: [{ name: 'ok-ev' }, { name: 'ok-ev' }] }), /duplicados/);
+test('rejects invalid or duplicate event names', () => {
+  assert.throws(() => generateComponent({ name: 'demo-e', events: [{ name: '---' }] }), /Invalid event name/);
+  assert.throws(() => generateComponent({ name: 'demo-e', events: [{ name: 'ok-ev' }, { name: 'ok-ev' }] }), /Duplicate/);
 });
 
-test('escapa la descripción dentro del atributo aria-label y del comentario', () => {
-  const out = generateComponent({ name: 'demo-d', description: 'Hola "x" </div> */ fin' });
-  assert.match(out.source, /aria-label="Hola &quot;x&quot; &lt;\/div&gt; \*\/ fin"/);
-  assert.doesNotMatch(out.source, /\*\/ fin\n \*\//);
+test('escapes description in aria-label attribute and comments', () => {
+  const out = generateComponent({ name: 'demo-d', description: 'Hello "x" </div> */ end' });
+  assert.match(out.source, /aria-label="Hello &quot;x&quot; &lt;\/div&gt; \*\/ end"/);
+  assert.doesNotMatch(out.source, /\*\/ end\n \*\//);
 });
 
-test('lanza error con nombre inválido', () => {
+test('throws on invalid name', () => {
   assert.throws(() => generateComponent({ name: 'x' }));
 });
 
-test('el código generado es JavaScript válido', async () => {
+test('generated code is valid JavaScript syntax', async () => {
   const { writeFileSync, rmSync, mkdtempSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');

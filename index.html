@@ -154,7 +154,64 @@
       background-image: var(--forge-grain);
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .preview-canvas {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       justify-content: center;
+    }
+    .preview-log {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed var(--forge-color-line);
+      padding: 10px 14px;
+      font-family: var(--forge-font-mono);
+      font-size: 11px;
+      color: var(--forge-color-ink);
+      min-height: 50px;
+      max-height: 120px;
+      overflow-y: auto;
+      letter-spacing: -0.01em;
+    }
+    .preview-log .log-entry {
+      margin-bottom: 4px;
+      border-left: 2px solid var(--forge-color-white);
+      padding-left: 6px;
+      color: var(--forge-color-chalk);
+    }
+    .preview-log .log-entry.event {
+      border-color: #3b9aff;
+    }
+    .recruiter-note {
+      margin-top: var(--forge-space-6);
+      border-top: 1px solid var(--forge-color-line);
+      padding-top: var(--forge-space-6);
+      font-size: 14px;
+      color: var(--forge-color-ink);
+      line-height: 1.4;
+    }
+    .recruiter-note h3 {
+      font-size: 12px;
+      font-family: var(--forge-font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--forge-color-white);
+      margin-bottom: var(--forge-space-2);
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--forge-space-6);
+      border-top: 1px solid var(--forge-color-line);
+      padding-top: var(--forge-space-4);
+      font-family: var(--forge-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--forge-color-ink);
+      letter-spacing: 0.05em;
     }
     .err {
       color: var(--forge-color-white);
@@ -179,27 +236,57 @@
 <main>
   <div class="header-layout">
     <h1>Lit Component Forge</h1>
-    <p class="lead">Generador de componentes Lit / Convenciones del equipo / Estilo Brutalista / Shadow DOM / Cero dependencias</p>
+    <p class="lead">AI-ASSISTED DEVELOPMENT OF ROBUST MICRO-FRONTENDS / COMPLIANT WITH TEAM CONVENTIONS / SHADOW DOM / ZERO DEPENDENCIES</p>
   </div>
 
   <form id="f">
     <div class="input-wrapper">
-      <input id="prompt" placeholder="DESCRIPCIÓN DEL COMPONENTE (ej. tarjeta de transferencia con monto y cuenta destino)" maxlength="300" required />
+      <input id="prompt" placeholder="e.g. transfer card with amount and destination account" maxlength="300" required />
     </div>
-    <button id="go" type="submit">Generar elemento</button>
+    <button id="go" type="submit">Generate Element</button>
   </form>
   <div class="err" id="err"></div>
 
   <div class="grid">
     <div class="pre-container">
-      <div class="label-tag">CÓDIGO FUENTE (.JS)</div>
-      <pre id="code">// El código generado aparecerá aquí.</pre>
+      <div class="label-tag">SOURCE CODE (.JS)</div>
+      <pre id="code">// The generated source code will appear here.</pre>
     </div>
     <div>
-      <div class="label-tag">VISTA PREVIA (CUSTOM ELEMENT)</div>
-      <div class="preview" id="preview"></div>
+      <div class="label-tag">LIVE PREVIEW (CUSTOM ELEMENT)</div>
+      <div class="preview" id="preview-container">
+        <div class="preview-canvas" id="preview">
+          <!-- Live component will mount here -->
+        </div>
+        <div class="preview-log" id="log">
+          <div>&gt; Event output terminal active. Click generated element actions to inspect event dispatches.</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <section class="recruiter-note">
+    <h3>Developer Architecture Insight</h3>
+    <p>
+      This program solves a critical bottleneck in enterprise environments: the scaling, consistency, and compliance of distributed micro-frontends.
+      By pairing a custom generative AI model with strict team schema validations, it compiles user requirements directly into production-grade Lit elements.
+      Key problems solved:
+    </p>
+    <ul style="margin: var(--forge-space-2) 0 var(--forge-space-2) 20px; list-style-type: square;">
+      <li>Ensures complete Shadow DOM encapsulation to shield component behavior and theme tokens.</li>
+      <li>Enforces strict ARIA roles, labels, and accessible keyboard focus models by default.</li>
+      <li>Generates native-compliant Lit structures without requiring experimental legacy decorators, ensuring future-proof, buildless browser compatibility.</li>
+      <li>Exposes reactive declarative properties and standard bubble/composed CustomEvents for decoupled communication across parent applications.</li>
+    </ul>
+    <p>
+      It features an active Model Context Protocol (MCP) server, making this pipeline immediately accessible to developer agents, IDE integrations, and automated pipelines.
+    </p>
+  </section>
+
+  <footer class="footer">
+    <span>LIT-COMPONENT-FORGE v0.1.0</span>
+    <span>DEVELOPED BY NOOMESK 2026</span>
+  </footer>
 </main>
 
 <script type="module">
@@ -208,33 +295,89 @@
   const err = document.getElementById('err');
   const code = document.getElementById('code');
   const preview = document.getElementById('preview');
+  const log = document.getElementById('log');
+
+  const addLog = (text, isEvent = false) => {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry' + (isEvent ? ' event' : '');
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     err.textContent = '';
     btn.disabled = true;
-    btn.textContent = '...';
+    btn.textContent = 'GENERATING...';
     try {
+      const promptVal = document.getElementById('prompt').value;
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: document.getElementById('prompt').value }),
+        body: JSON.stringify({ prompt: promptVal }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error');
+      if (!res.ok) throw new Error(data.error || 'Generation failed');
 
       code.textContent = data.source;
-      // Vista previa: el componente se registra y se monta dentro del contenedor
-      const blob = new Blob([data.source], { type: 'text/javascript' });
+      addLog(`Component "${data.tag}" successfully compiled.`);
+
+      // Para asegurar la resolución de módulos dentro de un ObjectURL de tipo blob en cualquier navegador,
+      // reescribimos temporalmente las importaciones bare de 'lit' a URL absolutas en la ejecución en vivo.
+      // El código fuente mostrado arriba en la interfaz se mantiene 100% limpio y original.
+      let executableSource = data.source;
+      executableSource = executableSource.replace(
+        /from 'lit';/g,
+        "from 'https://cdn.jsdelivr.net/npm/lit@3/+esm';"
+      );
+
+      const blob = new Blob([executableSource], { type: 'text/javascript' });
       const url = URL.createObjectURL(blob);
-      const mod = await import(url);
+      await import(url);
+
       preview.innerHTML = '';
-      preview.appendChild(document.createElement(data.tag));
+      const el = document.createElement(data.tag);
+
+      // Si el componente tiene propiedades definidas, las inicializamos con valores de ejemplo visibles
+      if (el.constructor.properties) {
+        Object.keys(el.constructor.properties).forEach(propKey => {
+          const schema = el.constructor.properties[propKey];
+          if (schema.type === Number) {
+            el[propKey] = 250; // valor numérico de demostración
+          } else if (schema.type === Boolean) {
+            el[propKey] = true; // flag activado
+          } else {
+            el[propKey] = "DEMO_VAL"; // string visible
+          }
+        });
+      }
+
+      // Escuchamos de manera dinámica todos los eventos personalizados declarados en el componente
+      // para mostrarlos en tiempo real en nuestra terminal integrada de logs.
+      const eventMatches = [...data.source.matchAll(/@fires\s+([a-zA-Z0-9,-_\s]+)/g)];
+      if (eventMatches.length) {
+        const declaredEvents = eventMatches[0][1]
+          .split(',')
+          .map(ev => ev.trim())
+          .filter(Boolean);
+
+        declaredEvents.forEach(eventName => {
+          el.addEventListener(eventName, (event) => {
+            const detailStr = event.detail !== undefined && event.detail !== null ? JSON.stringify(event.detail) : 'null';
+            addLog(`EVENT DISPATCHED: "${eventName}" with detail: ${detailStr}`, true);
+          });
+        });
+      }
+
+      preview.appendChild(el);
+      addLog(`Mounted <${data.tag}> in preview canvas.`);
     } catch (ex) {
       err.textContent = ex.message;
+      addLog(`ERROR: ${ex.message}`);
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Generar';
+      btn.textContent = 'Generate Element';
     }
   });
 </script>
