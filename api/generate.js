@@ -33,7 +33,9 @@ export default async function handler(req, res) {
       }),
     });
     if (!upstream.ok) {
-      console.error('Groq error', upstream.status);
+      // El cuerpo de error de Groq describe la causa (modelo, parámetros); no incluye la clave.
+      const detail = (await upstream.text()).slice(0, 500);
+      console.error('Groq error', upstream.status, detail);
       return res.status(502).json({ error: 'Upstream error' });
     }
     const data = await upstream.json();
