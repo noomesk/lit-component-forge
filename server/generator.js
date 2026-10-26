@@ -134,13 +134,39 @@ export class ${cls} extends LitElement {
   static styles = css\`
     :host {
       display: block;
-      font-family: var(--forge-font-sans, system-ui, sans-serif);
+      font-family: var(--forge-font-sans, system-ui, -apple-system, sans-serif);
       color: var(--${tag}-text, var(--forge-color-chalk, #e6e6e6));
-      background: var(--${tag}-bg, var(--forge-color-surface, #0a0a0a));
-      border: 1px solid var(--${tag}-border, var(--forge-color-line, #2a2a2a));
-      border-radius: var(--forge-radius, 4px);
-      padding: var(--forge-space-4, 1rem);
+      background-color: var(--${tag}-bg, var(--forge-color-surface, #0a0a0a));
+      background-image: var(--forge-grain, url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"));
+      border-top: 1px solid var(--${tag}-border, var(--forge-color-line, #2a2a2a));
+      padding: var(--forge-space-6, 1.5rem) var(--forge-space-4, 1rem);
       box-sizing: border-box;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+    h2, .title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin: 0 0 var(--forge-space-4, 1rem) 0;
+      color: var(--forge-color-white, #fff);
+      letter-spacing: -0.06em;
+      transform: rotate(-0.5deg);
+    }
+    .meta {
+      font-family: var(--forge-font-mono, monospace);
+      font-size: 11px;
+      color: var(--forge-color-ink, #8a8a8a);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--forge-space-2, 0.4rem);
+    }
+    .layout-offset {
+      margin-left: 10%;
+      max-width: 85%;
+      border-left: 2px solid var(--forge-color-line, #2a2a2a);
+      padding-left: var(--forge-space-4, 1rem);
     }
     :focus-visible {
       outline: 1px solid var(--${tag}-accent, var(--forge-color-accent, #fff));
@@ -155,7 +181,11 @@ ${propOptions}
 ${ctor}${eventMethods}${events.length ? '\n\n' : ''}  render() {
     return html\`
       <div role="region" aria-label="${label}">
-        <slot></slot>
+        <div class="meta">${tag}</div>
+        <h2 class="title">${label}</h2>
+        <div class="layout-offset">
+          <slot></slot>
+        </div>
       </div>
     \`;
   }

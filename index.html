@@ -9,37 +9,167 @@
       --forge-color-black: #000;
       --forge-color-surface: #0a0a0a;
       --forge-color-surface-2: #141414;
-      --forge-color-line: #2a2a2a;
-      --forge-color-rule: #1f1f1f;
-      --forge-color-ink: #8a8a8a;
-      --forge-color-chalk: #e6e6e6;
-      --forge-color-white: #fff;
-      --forge-color-accent: #fff;
-      --forge-font-sans: system-ui, sans-serif;
-      --forge-font-mono: ui-monospace, monospace;
-      --forge-radius: 4px;
-      --forge-space-2: .4rem;
-      --forge-space-4: 1rem;
-      --forge-space-6: 1.5rem;
+      --forge-color-line: #222222;
+      --forge-color-rule: #181818;
+      --forge-color-ink: #707070;
+      --forge-color-chalk: #cccccc;
+      --forge-color-white: #ffffff;
+      --forge-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --forge-font-mono: ui-monospace, SFMono-Regular, monospace;
+      --forge-radius: 0px; /* brutalista: sin bordes redondeados */
+      --forge-space-2: .5rem;
+      --forge-space-4: 1.2rem;
+      --forge-space-6: 2rem;
       --forge-ease-out: cubic-bezier(0, 0, .2, 1);
+      --forge-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--forge-color-black); color: var(--forge-color-chalk); font-family: var(--forge-font-sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
-    main { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
-    h1 { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--forge-color-white); font-weight: 500; font-family: var(--forge-font-mono); }
-    p.lead { color: var(--forge-color-ink); font-size: 14px; margin-top: var(--forge-space-2); }
-    form { display: flex; gap: 12px; margin: var(--forge-space-6) 0; }
-    input { flex: 1; background: var(--forge-color-surface-2); border: 1px solid var(--forge-color-line); border-radius: var(--forge-radius); color: var(--forge-color-chalk); padding: 12px; font: inherit; }
-    input:focus-visible { outline: 1px solid var(--forge-color-white); outline-offset: 2px; }
-    button { background: var(--forge-color-white); color: var(--forge-color-black); border: 1px solid var(--forge-color-white); border-radius: var(--forge-radius); padding: 12px 20px; font: inherit; font-weight: 500; cursor: pointer; }
-    button:hover { background: var(--forge-color-chalk); }
-    button:focus-visible { outline: 1px solid var(--forge-color-white); outline-offset: 2px; }
-    button:disabled { opacity: .4; cursor: default; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--forge-space-4); }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-    pre { background: var(--forge-color-black); border: 1px solid var(--forge-color-rule); border-radius: var(--forge-radius); padding: var(--forge-space-4); overflow: auto; font: 12px/1.5 var(--forge-font-mono); color: var(--forge-color-ink); min-height: 280px; }
-    .preview { border: 1px solid var(--forge-color-rule); border-radius: var(--forge-radius); padding: var(--forge-space-4); min-height: 280px; background: var(--forge-color-surface); }
-    .err { color: var(--forge-color-chalk); font-size: 12px; min-height: 16px; margin-top: var(--forge-space-2); }
+    body {
+      background-color: var(--forge-color-black);
+      background-image: var(--forge-grain);
+      color: var(--forge-color-chalk);
+      font-family: var(--forge-font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    .header-layout {
+      margin-bottom: var(--forge-space-6);
+      border-bottom: 1px solid var(--forge-color-line);
+      padding-bottom: var(--forge-space-4);
+    }
+    h1 {
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 900;
+      line-height: 0.9;
+      text-transform: uppercase;
+      color: var(--forge-color-white);
+      letter-spacing: -0.06em;
+      margin: 0;
+      transform: rotate(-0.8deg);
+      transform-origin: left;
+    }
+    p.lead {
+      color: var(--forge-color-ink);
+      font-size: 15px;
+      font-family: var(--forge-font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: var(--forge-space-4);
+      margin-left: 5%;
+      border-left: 2px solid var(--forge-color-line);
+      padding-left: var(--forge-space-2);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: var(--forge-space-6) 0 var(--forge-space-6) 5%;
+      max-width: 600px;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    input {
+      width: 100%;
+      background: var(--forge-color-surface-2);
+      border: 1px solid var(--forge-color-line);
+      border-radius: var(--forge-radius);
+      color: var(--forge-color-white);
+      padding: 18px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+    input:focus-visible {
+      outline: 1px solid var(--forge-color-white);
+    }
+    button {
+      align-self: flex-start;
+      background: var(--forge-color-white);
+      color: var(--forge-color-black);
+      border: 1px solid var(--forge-color-white);
+      border-radius: var(--forge-radius);
+      padding: 14px 28px;
+      font: inherit;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+    }
+    button:hover {
+      background: var(--forge-color-chalk);
+    }
+    button:focus-visible {
+      outline: 1px solid var(--forge-color-white);
+      outline-offset: 2px;
+    }
+    button:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .pre-container {
+      position: relative;
+    }
+    .label-tag {
+      font-family: var(--forge-font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--forge-color-ink);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    pre {
+      background: var(--forge-color-black);
+      background-image: var(--forge-grain);
+      border: 1px solid var(--forge-color-line);
+      border-radius: var(--forge-radius);
+      padding: var(--forge-space-4);
+      overflow: auto;
+      font: 11px/1.4 var(--forge-font-mono);
+      color: var(--forge-color-ink);
+      min-height: 400px;
+    }
+    .preview {
+      border: 1px solid var(--forge-color-line);
+      border-radius: var(--forge-radius);
+      padding: var(--forge-space-6);
+      min-height: 400px;
+      background: var(--forge-color-surface-2);
+      background-image: var(--forge-grain);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .err {
+      color: var(--forge-color-white);
+      background: #3a1010;
+      border: 1px solid #7a2020;
+      padding: var(--forge-space-2) var(--forge-space-4);
+      font-size: 12px;
+      font-family: var(--forge-font-mono);
+      min-height: 0;
+      margin-top: var(--forge-space-2);
+      display: none;
+    }
+    .err:not(:empty) {
+      display: block;
+    }
   </style>
   <script type="importmap">
     { "imports": { "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm", "lit/": "https://cdn.jsdelivr.net/npm/lit@3/" } }
@@ -47,18 +177,28 @@
 </head>
 <body>
 <main>
-  <h1>Lit Component Forge</h1>
-  <p class="lead">Describe un componente y lo genero con Lit, Shadow DOM y eventos personalizados.</p>
+  <div class="header-layout">
+    <h1>Lit Component Forge</h1>
+    <p class="lead">Generador de componentes Lit / Convenciones del equipo / Estilo Brutalista / Shadow DOM / Cero dependencias</p>
+  </div>
 
   <form id="f">
-    <input id="prompt" placeholder="ej. tarjeta de transferencia con monto y cuenta destino" maxlength="300" required />
-    <button id="go" type="submit">Generar</button>
+    <div class="input-wrapper">
+      <input id="prompt" placeholder="DESCRIPCIÓN DEL COMPONENTE (ej. tarjeta de transferencia con monto y cuenta destino)" maxlength="300" required />
+    </div>
+    <button id="go" type="submit">Generar elemento</button>
   </form>
   <div class="err" id="err"></div>
 
   <div class="grid">
-    <pre id="code">// el código generado aparece aquí</pre>
-    <div class="preview" id="preview"></div>
+    <div class="pre-container">
+      <div class="label-tag">CÓDIGO FUENTE (.JS)</div>
+      <pre id="code">// El código generado aparecerá aquí.</pre>
+    </div>
+    <div>
+      <div class="label-tag">VISTA PREVIA (CUSTOM ELEMENT)</div>
+      <div class="preview" id="preview"></div>
+    </div>
   </div>
 </main>
 
