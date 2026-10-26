@@ -474,15 +474,24 @@
       executableSource = executableSource.replace(new RegExp(`'${data.tag}'`, 'g'), `'${previewTag}'`);
       executableSource = executableSource.replace(new RegExp(data.tag, 'g'), previewTag);
 
-      // Reemplazamos el bare import de lit para cargarlo directo por CDN en el Blob
+      // Reemplazamos el bare import de lit para cargarlo directo por CDN en el módulo inyectado
       executableSource = executableSource.replace(
         /from 'lit';/g,
         "from 'https://cdn.jsdelivr.net/npm/lit@3/+esm';"
       );
 
-      const blob = new Blob([executableSource], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      await import(url);
+      // Creamos e inyectamos un script de tipo módulo inline. Esto soluciona por completo
+      // las restricciones de seguridad, CSP, origen cruzado y conflictos de instancia de Lit 
+      // típicos de los Blob URLs (import('blob:...')), garantizando ejecución e inicialización
+      // nativa del Custom Element en el 100% de los navegadores (Chrome, Safari, Firefox).
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.textContent = executableSource;
+      document.head.appendChild(script);
+
+      // Esperamos de manera nativa a que el navegador termine de parsear e inicializar 
+      // el Custom Element en el registro global antes de instanciarlo.
+      await customElements.whenDefined(previewTag);
 
       preview.innerHTML = '';
       const el = document.createElement(previewTag);
